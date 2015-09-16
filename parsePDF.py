@@ -42,7 +42,7 @@ def parseTocText(t):
 # Function to go through pages as listed by toc
 def transTocToPages(pages):
 	with open("schooldata.txt","w") as sd:
-		for p in range(len(pages)):
+		for p in range(0,1):
 			pgnm = "toc_"+str(pages[p])+".txt"
 			lines = []
 			with open(pgnm) as toc:
@@ -55,22 +55,44 @@ def transTocToPages(pages):
 					pass
 				else:
 					extractedPages.append(extractPageNum(lines[l]))
+					break
 			#print(extractedPages)
 			# Calculate offset in pages from listed page number
 			offset = (pages[p]+1) - extractedPages[0]
-			for i in range(len(extractedPages)):
-				text = ""
-				if i == len(extractedPages) - 1:
-					# Work up to next table of contents page
-					text = convert_pdf_to_txt(path,pages=range(extractedPages[i]+offset,pages[p+1]))
+			# Set range of pages to convert
+			r = []
+			if p == (len(pages)-1):
+				# 661 is hardcoded from book, will make more general later
+				r = range(extractedPages[0]+offset,661)
+			else:
+				r = range(extractedPages[0]+offset,pages[p+1])
+			print(r)
+			textToWrite = ""
+			prevSchoolName = ""
+			for i in r:
+				sbuffer = convert_pdf_to_txt(path,pages=[i])
+				sbuffer_raw = repr(sbuffer)
+				# Search for school name by looking for "\xe2\x80\xa2 DBN"
+				#print(sbuffer_raw)
+				match = re.search(r"\\xe2\\x80\\xa2",sbuffer_raw)
+				match2 = re.search(r"(\w)+",sbuffer_raw)
+				if match == None:
+					# No school name
+					break
 				else:
-					text = convert_pdf_to_txt(path,pages=range(extractedPages[i]+offset,extractedPages[i+1]+offset))
-					#for j in range(extractedPages[i]+offset,extractedPages[i+1]+offset):
-					#	print(j)
-				text += "\n --- END --- \n"
-				print(text)
-				sd.writelines(text)
-			print("\nFinished borough\n")
+					#Find beginning of word ignoring new lines and spaces
+					name = sbuffer_raw[match2.start():match.start()]
+					if name == prevSchoolName:
+						# Continue writing
+						textToWrite += sbuffer
+					else:
+						# A different school
+						textToWrite += "\n ----- END SCHOOL ----- \n"
+						sd.writelines(textToWrite)
+						textToWrite = sbuffer
+				#print("page "+str(i))
+				#print(repr(sbuffer))
+
 
 
 # Function to parse page number from line
