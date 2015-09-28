@@ -15,6 +15,102 @@ import re
 import sys
 
 
+'''
+Databases:
+
+School: 
+Name, ID, Address, phone, fax, email, website, sharedspace, totalStudents, gradeSpan, siteAccessibility, SpecialEducation, 
+overview
+
+Programs
+Name, code, schoolID, grade, interest, admission method, seats, applicants, applicants per seat, description
+
+
+
+'''
+# Function to scan school to form DB
+def createSchoolDB():
+	pass
+
+def createProgDB():
+	pass
+
+def createSubDB():
+	pass
+
+def createBusDB():
+	pass
+
+def createLangDB():
+	pass
+
+def createAPDB():
+	pass
+
+def createClubDB():
+	pass
+
+def createPBDB():
+	pass
+
+def createPGDB():
+	pass
+
+def createPercentDB():
+	pass
+
+def createProgHiDB():
+	pass
+
+# Function to build "databases" by writing to csv files 
+def buildDatabases(db):
+	# db is a list of databases to build
+	# dbFlags is a dictionary of db names to true/false to create. Default = 0
+	dbFlags = {
+		"schools": 0,
+		"programs": 0,
+		"subwayToSchool": 0,
+		"buses": 0,
+		"languages": 0,
+		"aps": 0,
+		"clubs": 0,
+		"psal_boys": 0,
+		"psal_girls": 0,
+		"performance_percentages": 0,
+		"program_highlights": 0
+		}
+	dbFuncs = {
+		"schools": createSchoolDB,
+		"programs": createProgDB,
+		"subwayToSchool": createSubDB,
+		"buses": createBusDB,
+		"languages": createLangDB,
+		"aps": createAPDB,
+		"clubs": createClubDB,
+		"psal_boys": createPBDB,
+		"psal_girls": createPGDB,
+		"performance_percentages": createPercentDB,
+		"program_highlights": createProgHiDB
+	}
+
+	# Set flags to 1 for all db to be built
+	for d in db:
+		dbFlags[d] = 1
+	# Separate all schools from each other to build db
+	schoolFiles =[]
+	# Open files based on flags
+	for key, vals in dbFlags.iteritems():
+		if vals == 1:
+			schoolFiles.append(key)
+
+	with open("schooldata.txt", "r") as doc:
+		# chunk up text into schools by finding instances of ---- END SCHOOL -----\n
+		schools = re.split(r"---- END SCHOOL -----", doc.read())
+	for s in schools:
+		pass
+
+
+
 # Function to generate text files of parsed table of contents files
 def gen_TOC(path,pages):
 	for p in pages:
@@ -42,7 +138,7 @@ def parseTocText(t):
 # Function to go through pages as listed by toc
 def transTocToPages(pages):
 	with open("schooldata.txt","w") as sd:
-		for p in range(0,1):
+		for p in range(len(pages)):
 			pgnm = "toc_"+str(pages[p])+".txt"
 			lines = []
 			with open(pgnm) as toc:
@@ -66,7 +162,7 @@ def transTocToPages(pages):
 				r = range(extractedPages[0]+offset,661)
 			else:
 				r = range(extractedPages[0]+offset,pages[p+1])
-			print(r)
+			#print(r)
 			textToWrite = ""
 			prevSchoolName = ""
 			for i in r:
@@ -81,7 +177,15 @@ def transTocToPages(pages):
 					break
 				else:
 					#Find beginning of word ignoring new lines and spaces
-					name = sbuffer_raw[match2.start():match.start()]
+					name = (sbuffer_raw[match2.start():match.start()]).replace('\n','')
+					#Find first captial letter fo name and exclude everything else
+					fcl = 0
+					for n in name:
+						if n.isupper():
+							break
+						fcl += 1
+					name = name[fcl:]
+					print(name + " vs " + prevSchoolName)
 					if name == prevSchoolName:
 						# Continue writing
 						textToWrite += sbuffer
@@ -90,6 +194,8 @@ def transTocToPages(pages):
 						textToWrite += "\n ----- END SCHOOL ----- \n"
 						sd.writelines(textToWrite)
 						textToWrite = sbuffer
+					prevSchoolName = name
+
 				#print("page "+str(i))
 				#print(repr(sbuffer))
 
@@ -140,3 +246,7 @@ if __name__ == "__main__":
 		gen_TOC(path,tocpages)
 	elif sys.argv[1] == "transPages":
 		transTocToPages(tocpages)
+	elif sys.argv[1] == "buildDB":
+		buildDatabases(["schools"])
+
+		
