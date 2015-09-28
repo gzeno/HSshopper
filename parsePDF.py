@@ -29,37 +29,37 @@ Name, code, schoolID, grade, interest, admission method, seats, applicants, appl
 
 '''
 # Function to scan school to form DB
-def createSchoolDB(text):
+def createSchoolDB(text,f):
 	print("createSchoolDB")
 
-def createProgDB(text):
+def createProgDB(text,f):
 	print("createProgDB")
 
-def createSubDB(text):
+def createSubDB(text,f):
 	print("createSubDB")
 
-def createBusDB(text):
+def createBusDB(text,f):
 	print("createBusDB")
 
-def createLangDB(text):
+def createLangDB(text,f):
 	print("createLangDB")
 
-def createAPDB(text):
+def createAPDB(text,f):
 	print("createAPDB")
 
-def createClubDB(text):
+def createClubDB(text,f):
 	print("createClubDB")
 
-def createPBDB(text):
+def createPBDB(text,f):
 	print("createPBDB")
 
-def createPGDB(text):
+def createPGDB(text,f):
 	print("createPGDB")
 
-def createPercentDB(text):
+def createPercentDB(text,f):
 	print("createPercentDB")
 
-def createProgHiDB(text):
+def createProgHiDB(text,f):
 	print("createProgHiDB")
 
 # Function to build "databases" by writing to csv files 
@@ -118,7 +118,13 @@ def buildDatabases(db):
 		# chunk up text into schools by finding instances of ---- END SCHOOL -----\n
 		schools = re.split(r"---- END SCHOOL -----", doc.read())
 	for s in schools:
-		pass
+		for x in db:
+			dbFuncs[x](s,dbIO[x])
+
+	# close all the IOs
+	for key, val in dbIO.iteritems():
+		if not val == None:
+			val.close()
 
 
 
