@@ -29,56 +29,71 @@ Name, code, schoolID, grade, interest, admission method, seats, applicants, appl
 
 '''
 # Function to scan school to form DB
-def createSchoolDB():
-	pass
+def createSchoolDB(text):
+	print("createSchoolDB")
 
-def createProgDB():
-	pass
+def createProgDB(text):
+	print("createProgDB")
 
-def createSubDB():
-	pass
+def createSubDB(text):
+	print("createSubDB")
 
-def createBusDB():
-	pass
+def createBusDB(text):
+	print("createBusDB")
 
-def createLangDB():
-	pass
+def createLangDB(text):
+	print("createLangDB")
 
-def createAPDB():
-	pass
+def createAPDB(text):
+	print("createAPDB")
 
-def createClubDB():
-	pass
+def createClubDB(text):
+	print("createClubDB")
 
-def createPBDB():
-	pass
+def createPBDB(text):
+	print("createPBDB")
 
-def createPGDB():
-	pass
+def createPGDB(text):
+	print("createPGDB")
 
-def createPercentDB():
-	pass
+def createPercentDB(text):
+	print("createPercentDB")
 
-def createProgHiDB():
-	pass
+def createProgHiDB(text):
+	print("createProgHiDB")
 
 # Function to build "databases" by writing to csv files 
 def buildDatabases(db):
 	# db is a list of databases to build
-	# dbFlags is a dictionary of db names to true/false to create. Default = 0
-	dbFlags = {
-		"schools": 0,
-		"programs": 0,
-		"subwayToSchool": 0,
-		"buses": 0,
-		"languages": 0,
-		"aps": 0,
-		"clubs": 0,
-		"psal_boys": 0,
-		"psal_girls": 0,
-		"performance_percentages": 0,
-		"program_highlights": 0
+	# dbFN are the default filenames
+	dbFN = {
+		"schools": "schoolDB.txt",
+		"programs": "programsDB.txt",
+		"subwayToSchool": "subwayDB.txt",
+		"buses": "busDB.txt",
+		"languages": "langDB.txt",
+		"aps": "apDB.txt",
+		"clubs": "clubDB.txt",
+		"psal_boys": "pBoyDB.txt",
+		"psal_girls": "pGirlDB.txt",
+		"performance_percentages": "percentDB.txt",
+		"program_highlights": "progHiDB.txt"
 		}
+	# dbIO is the mappings of open files to their strings, default None
+	dbIO = {
+		"schools": None,
+		"programs": None,
+		"subwayToSchool": None,
+		"buses": None,
+		"languages": None,
+		"aps": None,
+		"clubs": None,
+		"psal_boys": None,
+		"psal_girls": None,
+		"performance_percentages": None,
+		"program_highlights": None
+	}
+	# dbFuncs is the mapping to their respective functions
 	dbFuncs = {
 		"schools": createSchoolDB,
 		"programs": createProgDB,
@@ -92,17 +107,13 @@ def buildDatabases(db):
 		"performance_percentages": createPercentDB,
 		"program_highlights": createProgHiDB
 	}
+	# Create file io
+	for x in db:
+		dbIO[x] = open(dbFN[x],"w")
 
-	# Set flags to 1 for all db to be built
-	for d in db:
-		dbFlags[d] = 1
+	#print(dbIO)
+
 	# Separate all schools from each other to build db
-	schoolFiles =[]
-	# Open files based on flags
-	for key, vals in dbFlags.iteritems():
-		if vals == 1:
-			schoolFiles.append(key)
-
 	with open("schooldata.txt", "r") as doc:
 		# chunk up text into schools by finding instances of ---- END SCHOOL -----\n
 		schools = re.split(r"---- END SCHOOL -----", doc.read())
