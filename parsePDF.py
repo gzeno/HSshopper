@@ -28,9 +28,35 @@ Name, code, schoolID, grade, interest, admission method, seats, applicants, appl
 
 
 '''
-# Function to scan school to form DB
+def extractSchoolName(sbuffer_raw):
+	#match = re.search(r"\\xe2\\x80\\xa2",sbuffer_raw)
+	#match2 = re.search(r"(\w)+",sbuffer_raw)
+	#match3 = re.search(r"((\\n\\n)|^)[\w\s\\\(\)\.\-&:'\"\d]*?(\\xe2\\x80\\x99)?[\w\\\(\)\.\-&:'\"\d]*?(\\xe2\\x80\\xa2)",sbuffer_raw)
+	match3 = re.search(r"^.+?DBN\s+?[\d\w]{6}",sbuffer_raw,re.MULTILINE)
+	if match3 == None:
+		# No school name
+		print("No name found")
+		print(sbuffer_raw)
+		return None
+	else:
+		#Find beginning of word ignoring new lines and spaces
+		name = (sbuffer_raw[match3.start():match3.end()]).replace('\n','')
+		print(name)
+		#Find first captial letter fo name and exclude everything else
+		#print(sbuffer_raw)
+		fcl = 0
+		for n in name:
+			if n.isupper():
+				break
+			fcl += 1
+		return name[fcl:-14]
+
+# Functions to scan school to form DB
 def createSchoolDB(text,f):
-	print("createSchoolDB")
+	# Find each category in the text and write to f
+	#Name, ID, Address, phone, fax, email, website, sharedspace, totalStudents, gradeSpan, siteAccessibility, SpecialEducation, overview
+	raw_text = repr(text)
+	print(extractSchoolName(raw_text))
 
 def createProgDB(text,f):
 	print("createProgDB")
@@ -65,6 +91,19 @@ def createProgHiDB(text,f):
 # Function to build "databases" by writing to csv files 
 def buildDatabases(db):
 	# db is a list of databases to build
+	dbCategories = {
+		"schools": "name, id, address, phone, fax, email, website, sharedSpace, totalStudents, gradeSpan, siteAccessibility, specialEducation, overview\n",
+		"programs": "name, code, schoolID, grade, interest, admission method, seats, applicants, applicantsPerSeat, description\n",
+		"subwayToSchool": "subwayDB.txt",
+		"buses": "busDB.txt",
+		"languages": "langDB.txt",
+		"aps": "apDB.txt",
+		"clubs": "clubDB.txt",
+		"psal_boys": "pBoyDB.txt",
+		"psal_girls": "pGirlDB.txt",
+		"performance_percentages": "percentDB.txt",
+		"program_highlights": "progHiDB.txt"
+	}
 	# dbFN are the default filenames
 	dbFN = {
 		"schools": "schoolDB.txt",
@@ -110,6 +149,7 @@ def buildDatabases(db):
 	# Create file io
 	for x in db:
 		dbIO[x] = open(dbFN[x],"w")
+		dbIO[x].write(dbCategories[x])
 
 	#print(dbIO)
 
@@ -184,25 +224,16 @@ def transTocToPages(pages):
 			prevSchoolName = ""
 			for i in r:
 				sbuffer = convert_pdf_to_txt(path,pages=[i])
-				sbuffer_raw = repr(sbuffer)
+				#sbuffer_raw = repr(sbuffer)
 				# Search for school name by looking for "\xe2\x80\xa2 DBN"
 				#print(sbuffer_raw)
-				match = re.search(r"\\xe2\\x80\\xa2",sbuffer_raw)
-				match2 = re.search(r"(\w)+",sbuffer_raw)
-				if match == None:
-					# No school name
-					break
+				name = extractSchoolName(sbuffer)
+				if name == None:
+					#print(sbuffer_raw + '\n\n\n')
+					next
 				else:
-					#Find beginning of word ignoring new lines and spaces
-					name = (sbuffer_raw[match2.start():match.start()]).replace('\n','')
-					#Find first captial letter fo name and exclude everything else
-					fcl = 0
-					for n in name:
-						if n.isupper():
-							break
-						fcl += 1
-					name = name[fcl:]
 					print(name + " vs " + prevSchoolName)
+					#print(sbuffer_raw + '\n\n\n')
 					if name == prevSchoolName:
 						# Continue writing
 						textToWrite += sbuffer
@@ -212,10 +243,6 @@ def transTocToPages(pages):
 						sd.writelines(textToWrite)
 						textToWrite = sbuffer
 					prevSchoolName = name
-
-				#print("page "+str(i))
-				#print(repr(sbuffer))
-
 
 
 # Function to parse page number from line
