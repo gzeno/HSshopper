@@ -41,7 +41,7 @@ def extractSchoolName(sbuffer_raw):
 	else:
 		#Find beginning of word ignoring new lines and spaces
 		name = (sbuffer_raw[match3.start():match3.end()]).replace('\n','')
-		print(name)
+		#print(name)
 		#Find first captial letter fo name and exclude everything else
 		#print(sbuffer_raw)
 		fcl = 0
@@ -55,8 +55,88 @@ def extractSchoolName(sbuffer_raw):
 def createSchoolDB(text,f):
 	# Find each category in the text and write to f
 	#Name, ID, Address, phone, fax, email, website, sharedspace, totalStudents, gradeSpan, siteAccessibility, SpecialEducation, overview
-	raw_text = repr(text)
-	print(extractSchoolName(raw_text))
+	#print(extractSchoolName(raw_text))
+	Name = extractSchoolName(text)
+	print(Name)
+	if Name == None:
+		return None
+	#ID
+	matchObj = re.search(r"DBN\s[\d\w]{6}",text,re.MULTILINE)
+	ID = text[matchObj.start()+4:matchObj.end()]
+	print("ID ="+ID)
+	#Address
+	matchObj = re.search(r"^Address:.*?,.*?$",text,re.MULTILINE|re.DOTALL)
+	if matchObj==None:
+		print("No address found")
+	else:
+		Address = (((text[matchObj.start()+8:matchObj.end()]).strip()).replace("\n\n",", ")).replace("\n",", ")
+		print("Address: "+Address)
+
+	#Phone
+	matchObj = re.search(r"^Phone.*",text,re.MULTILINE)
+	if matchObj==None:
+		print("No Phone # found")
+	else:
+		Phone= text[matchObj.start()+7:matchObj.end()]
+		print("Phone #: "+Phone)
+	#fax
+	matchObj = re.search(r"^Fax.*",text,re.MULTILINE)
+	if matchObj==None:
+		print("No Fax # found")
+	else:
+		Fax= text[matchObj.start()+4:matchObj.end()]
+		print("Fax #: "+Fax)
+	#website
+	matchObj = re.search(r"^Website.*",text,re.MULTILINE)
+	if matchObj==None:
+		print("No Phone # found")
+	else:
+		WS= text[matchObj.start()+8:matchObj.end()]
+		print("Website: "+WS)
+	#sharedspace
+	matchObj = re.search(r"^Shared\sSpace:.*",text,re.MULTILINE)
+	if matchObj==None:
+		print("No SHaredSpace found")
+	else:
+		SS= text[matchObj.start()+13:matchObj.end()]
+		print("Shared Space: "+SS)
+	#totalStudents
+	matchObj = re.search(r"^Total\sStudents\sin\sSchool:.*",text,re.MULTILINE)
+	if matchObj==None:
+		print("No numStudents found")
+	else:
+		numStudents= text[matchObj.start()+26:matchObj.end()]
+		print("numStudents: "+numStudents)
+	#Gradespan
+	matchObj = re.search(r"^Grade\sSpan\sof\sSchool.*",text,re.MULTILINE)
+	if matchObj==None:
+		print("No Grade Span found")
+	else:
+		GS= text[matchObj.start()+34:matchObj.end()]
+		print("Grade Span: "+GS)
+	#Site accessibility
+	matchObj = re.search(r"^Site\sAccessibility:.*",text,re.MULTILINE)
+	if matchObj==None:
+		print("No Site Accessibility found")
+	else:
+		SA= (text[matchObj.start()+19:matchObj.end()]).strip()
+		print("Site Accessibility: "+SA)
+	#specialEdu
+	matchObj = re.search(r"^Special\s*Education\s*Services.*",text,re.MULTILINE)
+	if matchObj==None:
+		print("No SE found")
+	else:
+		SE= text[matchObj.start()+31:matchObj.end()]
+		print("Special Education Services: "+SE)
+	#overview
+	matchObj = re.search(r"^Overview.*?\.\s*$",text,re.MULTILINE|re.DOTALL)
+	if matchObj==None:
+		print("No Overview # found")
+	else:
+		OV= text[matchObj.start()+10:matchObj.end()]
+		print("Overview : "+OV)
+	stringToWrite =Name+","+ID+","+Address+","+Phone+","+Fax+","+WS+","+SS+","+numStudents+","+GS+","+SA+","+SE+","+OV+"\n"
+	f.write(stringToWrite)
 
 def createProgDB(text,f):
 	print("createProgDB")
@@ -157,9 +237,12 @@ def buildDatabases(db):
 	with open("schooldata.txt", "r") as doc:
 		# chunk up text into schools by finding instances of ---- END SCHOOL -----\n
 		schools = re.split(r"---- END SCHOOL -----", doc.read())
+	#print("Number of schools : " + str(len(schools)))
 	for s in schools:
 		for x in db:
-			dbFuncs[x](s,dbIO[x])
+			val = dbFuncs[x](s,dbIO[x])
+			if val == None:
+				next
 
 	# close all the IOs
 	for key, val in dbIO.iteritems():
