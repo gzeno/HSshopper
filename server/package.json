@@ -9,6 +9,9 @@
   "author": "Gzeno",
   "license": "ISC",
   "dependencies": {
-    "express": "^4.13.3"
+    "cookie-parser": "^1.4.0",
+    "cookie-session": "^1.2.0",
+    "express": "^4.13.3",
+    "pg": "^4.4.2"
   }
 }
