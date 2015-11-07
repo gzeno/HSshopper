@@ -36,32 +36,62 @@
 		<div class="container">
 			<div class="starter-template">
 			<h1>Search for NYC high schools and their programs</h1>
+			<!--
 			<div id="search">
 				<div class="row">
 					<div class="col-lg-6">
-    					<div class="input-group">
-      						<input type="text" placeholder="School/Program" class="form-control" aria-label="...">
-      						<div class="input-group-btn">
-        						<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Search For <span class="caret"></span></button>
-        						<ul class="dropdown-menu dropdown-menu-right">
-          							<li><a href="#">School</a></li>
-          							<li><a href="#">Program</a></li> 
-        						</ul>
-      						</div><!-- /btn-group -->
-    					</div><!-- /input-group -->
-  					</div><!-- /.col-lg-6 -->
+						<div class="input-group">	
+							<input id="query" type="text" placeholder="School/Program" class="form-control" aria-label="...">
+    						<span class="input-group-btn">
+      							<button id="search-btn" type="button" class="btn btn-default">Search</button>
+    						</span>
+    					</div>
+  					</div>
 				</div>
 			</div>
-			
+			-->
+			<div id="adv_filter" class="panel panel-default">
+				<div class="panel-heading">Show advanced filters</div>
+				<div class="panel-body">
+					<div class="list-group">
+						<div id="school_props" class="list-group-item">
+							<h3>School Properties</h3>
+							<div class="row">
+								<label for="minStudents">Min Number of students: </label>
+								<input id="minStudents" type="number" min="0" max="10000" step="100"/>
+								<label for="maxStudents">Max Number of students: </label>
+								<input id="maxStudents" type="number" min="100" max="10000" step="100"/>
+							</div>
+							<div class="row">
+								<label for="sharedSpace">Shares a space: </label>
+								<input id="sharedSpace" type="checkbox"/>
+							</div>
+							<div class="row">
+								<label for="accessibility">Functionally Accessible: </label>
+								<input id="accessibility" type="checkbox"/>
+							</div>
+							<div class="row">
+								<label for="speducation">Provide Special Education Services: </label>
+								<input id="speducation" type="checkbox"/>
+							</div>
+
+						</div>
+						<div id="program_props" class="list-group-item">
+							<h3>Program Properties</h3>
+						</div>
+					</div>
+				</div>
+			</div>
 			<footer>
 				<p>Site written by Raymond Tse
 			</footer>
+			</div>
 		</div>
 
 		<!-- Javascript -->
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"> </script>
 		<script src="../js/bootstrap.min.js"></script>
-		<script src="../"
+		<script src="../js/home.js"></script>
 
 	</body>
 </html>

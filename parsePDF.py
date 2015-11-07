@@ -13,6 +13,7 @@ from pdfminer.pdfpage import PDFPage
 from cStringIO import StringIO
 import re
 import sys
+import csv
 
 
 '''
@@ -142,8 +143,8 @@ def createSchoolDB(text,f):
 	else:
 		OV= ((text[matchObj.start()+10:matchObj.end()]).replace('\n',' ')).strip()
 		print("Overview : "+OV)
-	stringToWrite ="\""+Name+"\","+ID+",\""+Address+"\","+Phone+","+Fax+","+email+","+WS+","+SS+","+numStudents+",\""+GS+"\","+SA+","+SE+",\""+OV+"\"\r\n"
-	f.write(stringToWrite)
+	rowToWrite =[Name,ID,Address,Phone,Fax,email,WS,SS,numStudents,GS,SA,SE,OV]
+	f.writerow(rowToWrite)
 
 def createProgDB(text,f):
 	print("createProgDB")
@@ -179,8 +180,8 @@ def createProgHiDB(text,f):
 def buildDatabases(db):
 	# db is a list of databases to build
 	dbCategories = {
-		"schools": "name, id, address, phone, fax, email, website, sharedspace, numstudents, gradespan, accessibility, speducation, overview\n",
-		"programs": "name, code, schoolID, grade, interest, admission method, seats, applicants, applicantsPerSeat, description\n",
+		"schools": ["name", "id", "address", "phone", "fax", "email", "website","sharedspace","numstudents","gradespan","accessibility","speducation","overview"],
+		"programs": ["name", "code", "schoolID","grade","interest","admission method","seats","applicants","applicantsPerSeat","description"],
 		"subwayToSchool": "subwayDB.txt",
 		"buses": "busDB.txt",
 		"languages": "langDB.txt",
@@ -193,20 +194,34 @@ def buildDatabases(db):
 	}
 	# dbFN are the default filenames
 	dbFN = {
-		"schools": "schoolDB.txt",
-		"programs": "programsDB.txt",
-		"subwayToSchool": "subwayDB.txt",
-		"buses": "busDB.txt",
-		"languages": "langDB.txt",
-		"aps": "apDB.txt",
-		"clubs": "clubDB.txt",
-		"psal_boys": "pBoyDB.txt",
-		"psal_girls": "pGirlDB.txt",
-		"performance_percentages": "percentDB.txt",
-		"program_highlights": "progHiDB.txt"
+		"schools": "schoolDB.csv",
+		"programs": "programsDB.csv",
+		"subwayToSchool": "subwayDB.csv",
+		"buses": "busDB.csv",
+		"languages": "langDB.csv",
+		"aps": "apDB.csv",
+		"clubs": "clubDB.csv",
+		"psal_boys": "pBoyDB.csv",
+		"psal_girls": "pGirlDB.csv",
+		"performance_percentages": "percentDB.csv",
+		"program_highlights": "progHiDB.csv"
 		}
 	# dbIO is the mappings of open files to their strings, default None
 	dbIO = {
+		"schools": None,
+		"programs": None,
+		"subwayToSchool": None,
+		"buses": None,
+		"languages": None,
+		"aps": None,
+		"clubs": None,
+		"psal_boys": None,
+		"psal_girls": None,
+		"performance_percentages": None,
+		"program_highlights": None
+	}
+	# CSV writers for respective IO
+	dbCSVWriter = {
 		"schools": None,
 		"programs": None,
 		"subwayToSchool": None,
@@ -235,8 +250,10 @@ def buildDatabases(db):
 	}
 	# Create file io
 	for x in db:
-		dbIO[x] = open(dbFN[x],"w")
-		dbIO[x].write(dbCategories[x])
+		dbIO[x] = open(dbFN[x],"wb")
+		dbCSVWriter[x] = csv.writer(dbIO[x],skipinitialspace=True)
+		# Header
+		dbCSVWriter[x].writerow(dbCategories[x])
 
 	#print(dbIO)
 
@@ -247,7 +264,7 @@ def buildDatabases(db):
 	#print("Number of schools : " + str(len(schools)))
 	for s in schools:
 		for x in db:
-			val = dbFuncs[x](s,dbIO[x])
+			val = dbFuncs[x](s,dbCSVWriter[x])
 			if val == None:
 				next
 
